@@ -43,8 +43,8 @@ module tb_calc_top;
   cmd = 4'd5; #20;
   cmd = 4'd0; #20;
   cmd = 4'b1011; #20;
-  cmd = 4'1; #20;
-  cmd = 4'5; #20;
+  cmd = 4'd1; #20;
+  cmd = 4'd5; #20;
   cmd = 4'b1110; #20;
 
   reset = 1; #2;
