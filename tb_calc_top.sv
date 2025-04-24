@@ -10,8 +10,6 @@ module tb_calc_top;
   // Outputs
   logic [6:0] displays [7:0];
   logic [1:0] status;
-  logic [2:0] EA;
-  logic [2:0] PE;
   
   
 
@@ -21,9 +19,7 @@ module tb_calc_top;
     .reset(reset),
     .cmd(cmd),
     .displays(displays),
-    .status(status),
-    .EA(EA),
-    .PE(PE)
+    .status(status)
   );
 
   // Geração de clock
@@ -38,6 +34,25 @@ module tb_calc_top;
   cmd = 4'd2; #20;
   cmd = 4'b1010; #20;
   cmd = 4'd3; #20;
+  cmd = 4'b1110; #20;
+
+
+  reset = 1; #2;
+  reset = 0; #20;
+
+  cmd = 4'd5; #20;
+  cmd = 4'd0; #20;
+  cmd = 4'b1011; #20;
+  cmd = 4'1; #20;
+  cmd = 4'5; #20;
+  cmd = 4'b1110; #20;
+
+  reset = 1; #2;
+  reset = 0; #20;
+
+  cmd = 4'd6; #20;
+  cmd = 4'b1100; #20;
+  cmd = 4'd2; #20;
   cmd = 4'b1110; #20;
 
   end

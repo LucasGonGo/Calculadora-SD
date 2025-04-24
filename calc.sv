@@ -5,11 +5,7 @@ module calc (
 
     output logic [1:0] status,
     output logic [3:0] data,
-    output logic [3:0] pos,
-    output logic [2:0] EA,
-    output logic [2:0] PE
-
-    
+    output logic [3:0] pos
 );
 
     localparam ESPERA_A = 3'b000;
@@ -18,6 +14,8 @@ module calc (
     localparam RESULT   = 3'b011;
     localparam ERRO     = 3'b100;
 
+    logic [2:0] EA;
+    logic [2:0] PE;
     
     logic [26:0] digits;
 
@@ -100,8 +98,6 @@ module calc (
                 end
 
                 RESULT: begin
-                    $display("OPERAÇÃO = %b", operacao);
-                    $display("STATUS = %b", status);
                     if (status == 2'b10) begin
                         
                     case (operacao)
