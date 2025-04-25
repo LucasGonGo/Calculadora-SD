@@ -22,13 +22,14 @@ module tb_calc_top;
     .status(status)
   );
 
+  $display("Não esqueça de escolher um dos testes, para isso, confira eles em tb_calc_top.sv!")
+
   // Geração de clock
   always #1 clock = ~clock;
 
   initial begin
-
-  reset = 1; #2;
-  reset = 0; #20;
+    reset = 1; #2;
+    reset = 0; #20;
 
   // Teste 1
   //  cmd = 4'd1; #20;
@@ -38,12 +39,12 @@ module tb_calc_top;
   //  cmd = 4'b1110; #20;
 
   // Teste 2
-   cmd = 4'd5; #20;
-   cmd = 4'd0; #20;
-   cmd = 4'b1011; #20;
-   cmd = 4'd1; #20;
-   cmd = 4'd5; #20;
-   cmd = 4'b1110; #20;
+  //  cmd = 4'd5; #20;
+  //  cmd = 4'd0; #20;
+  //  cmd = 4'b1011; #20;
+  //  cmd = 4'd1; #20;
+  //  cmd = 4'd5; #20;
+  //  cmd = 4'b1110; #20;
 
   // Teste 3
   // cmd = 4'd6; #20;
