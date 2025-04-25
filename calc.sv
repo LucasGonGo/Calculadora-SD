@@ -22,6 +22,9 @@ module calc (
     // Guardar as entradas
     logic [26:0] digits;
 
+    //habilitar a impressão
+    logic enable;
+
     // Salva as entradas entre ESPERA_A e ESPERA_B
     logic [26:0] regA, regB, regAux;
 
@@ -63,12 +66,13 @@ module calc (
 
                     ESPERA_A: 
                     begin
-                        if( status == 2'b10) begin
+                        if(!enable) begin
 
                             if (cmd <= 4'd9) begin
                                 digits <= (digits * 10) + cmd; // faz o deslocamento e adiciona
                                 status <= 2'b01;               // coloca status como ocupado para passar os valores para os displays
-
+                                temp <= ( temp * 10 ) + cmd;
+                                enable <= 1;
                             end 
 
                             else if (cmd == 4'b1111)           // Backspace
@@ -99,12 +103,14 @@ module calc (
                     ESPERA_B: 
                     begin
                         
-                        if( status == 2'b10) 
+                        if(!enable) 
                         begin
                             if (cmd <= 4'd9) 
                             begin
                                 digits <= (digits * 10) + cmd; // Adiciona o novo dígito
                                 status <= 2'b01;                // ocupado para att displays
+                                temp <= (temp * 10) + cmd;
+                                enable <= 1;
                             end 
                             else if (cmd == 4'b1111)        // Backspace
                             begin
