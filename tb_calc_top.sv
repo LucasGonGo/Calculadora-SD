@@ -34,10 +34,12 @@ module tb_calc_top;
     reset = 0; ;
 
   // Teste 1
-    cmd = 4'd1; #20;
-    cmd = 4'd2; #20;
-    cmd = 4'd3; #20;
-    cmd = 4'd3; #20;
+    cmd = 4'd1; #20; // 1
+    cmd = 4'd2; #20; // 2
+    cmd = 4'd3; #20; // 3
+    cmd = 4'b1010; #20; // +
+    cmd = 4'd1; #20; // 1
+    cmd = 4'b1110; #20; // 124
     $finish;
     
 

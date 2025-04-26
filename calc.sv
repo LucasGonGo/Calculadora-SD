@@ -173,8 +173,8 @@ end
 
     // mudar as maquina de estados
     always_comb begin        // talvez seja melhor fazer com combinacional
-    PE = ESPERA_A;
-       if (!enable)begin
+    if(reset)begin PE = ESPERA_A;end
+    else if (!enable)begin
         case (EA)
             ESPERA_A: begin
                 if ((cmd > 4'd9)&&(cmd < 4'd11))begin       // se for um operador passa para OP, se for 1111 (backspace) mantem em ESPERA_A
