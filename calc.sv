@@ -179,6 +179,10 @@ module calc (
                 if(enable)begin
                     // aqui estamos tendo alguns probleminhas ainda, o pos quando estiver em 0 não ira imprimir o valor certo, por conta do data estar atrasado 1 clock
                     // não sei se aquela coisa q o lucas fez de botar pos-1 vai funcionar, talvez sim, enfim de tarde vemos melhor, vo corta o cabelo
+                    if( pos == 4'd8)begin
+                        pos <= 0;
+                        enable <= 0;
+                        end
                     if (status == 00 || status == 11) begin // na real nem precisaria disso aq kkkkkk, pq ele só entra pra imprimir se existir o enable
                 
                     values[pos] <= temp % 10; temp <= temp/10; // coloca em values[pos] o valor do digits correspondente, depois corta esse valor

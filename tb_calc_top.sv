@@ -32,9 +32,10 @@ module tb_calc_top;
   // Teste 1
     cmd = 4'd1; #20;
     cmd = 4'd2; #20;
-    cmd = 4'b1010; #20;
     cmd = 4'd3; #20;
-    cmd = 4'b1110; #20;
+    cmd = 4'd3; #20;
+    $finish
+    
 
   // Teste 2
   //  cmd = 4'd5; #20;
