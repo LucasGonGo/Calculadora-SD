@@ -57,6 +57,7 @@ always_ff @(posedge clock or posedge reset) begin
         regB     <= 0;
         regAux   <= 0;
         count    <= 0;
+        temp     <= 0;
         status   <= 2'b10;   // 00 significa erro, 01 ocupado, 10 pronto e 11 imprimindo
         operacao <= 0;
         pos <= 0;
@@ -179,7 +180,7 @@ end
                 else PE = ESPERA_A;                        // se for um numero ou backspace mantem em ESPERA_A
             end
 
-            OP: if(status == 4'b10 && cmd < 4'b1010) PE = ESPERA_B;    // se estiver em PRONTO e não for operação, vai para ESPERA_B, possivel erro, não conseguimos resolver
+            OP: if(status == 2'b10 && cmd < 4'b1010) PE = ESPERA_B;    // se estiver em PRONTO e não for operação, vai para ESPERA_B, possivel erro, não conseguimos resolver
             else PE = OP;                                              // se for operação mantem em OP
                 
             ESPERA_B: begin
