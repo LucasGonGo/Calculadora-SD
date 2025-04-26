@@ -214,10 +214,10 @@ end
                         end
                     end
                     default:
-                        PE = ERRO;                                    // se não for nenhuma operação disponivel, vai para ERRO
+                        PE = RESULT;                                    // se não for nenhuma operação disponivel, volta pra RESULT
 
                 endcase
-            end else begin PE = RESULT;       end                          // se não estiver pronto, fica em RESULT (espera até o status de pronto)
+            end 
 
             default: begin
                 PE = ERRO; //fica no erro até dar reset               // se der ERRO, espera o RESET
