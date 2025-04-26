@@ -174,7 +174,6 @@ end
     // mudar as maquina de estados
     always_comb begin        // talvez seja melhor fazer com combinacional
     PE = ESPERA_A;
-    else
        if (!enable)begin
         case (EA)
             ESPERA_A: begin
