@@ -48,157 +48,126 @@ module calc (
             EA <= PE;
         end
     end
+    
+// Bloco sequencial: lógica da operação
+always_ff @(posedge clock or posedge reset) begin
+    if (reset) begin        // reset, zera tudo
+        digits   <= 0;      
+        regA     <= 0;
+        regB     <= 0;
+        regAux   <= 0;
+        count    <= 0;
+        status   <= 2'b10;   // 00 significa erro, 01 ocupado, 10 pronto e 11 imprimindo
+        operacao <= 0;
+        pos <= 0;
+    end else begin
 
-    // Bloco sequencial: lógica da operação
-    always_ff @(posedge clock or posedge reset) begin
-        if (reset) begin        // reset, zera tudo
-            digits   <= 0;      
-            regA     <= 0;
-            regB     <= 0;
-            regAux   <= 0;
-            count    <= 0;
-            status   <= 2'b10;   // 00 significa erro, 01 ocupado, 10 pronto e 11 imprimindo
-            operacao <= 0;
-            pos <= 4'b0000;
-            end else begin
+        // LÓGICA PARA OS DISPLAYS
+        if (enable) begin
+            if (pos == 4'd8) begin
+                pos <= 0;
+                enable <= 0;
+            end else if (status == 2'b00 || status == 2'b11) begin
+                values[pos] <= temp % 10;
+                temp <= temp / 10;
+                data <= values[pos];
+                pos <= pos + 1;
+            end
+        end else begin
+            case (EA)
 
-                case (EA)
-
-                    ESPERA_A: 
-                    begin
-                        if(!enable) begin
-
-                            if (cmd <= 4'd9) begin
-                                digits <= (digits * 10) + cmd; // faz o deslocamento e adiciona
-                                status <= 2'b11;               // coloca status como imprimindo para passar os valores para os displays
-                                temp <= ( temp * 10 ) + cmd; //temp vai ser exibido no display
-                                enable <= 1;
-                            end 
-
-                            else if (cmd == 4'b1111)           // Backspace
-                            begin
-                                digits <= digits / 10; // corta o ultimo numero de digits
-                                temp <= temp / 10;
-                                status <= 2'b11;       // coloca em ocupado para atualizar os displays
-                            end 
-
+                ESPERA_A: begin
+                    if (!enable) begin
+                        if (cmd <= 4'd9) begin
+                            digits <= (digits * 10) + cmd;
+                            status <= 2'b11;
+                            temp <= (temp * 10) + cmd;
+                            enable <= 1;
+                        end else if (cmd == 4'b1111) begin // Backspace
+                            digits <= digits / 10;
+                            temp <= temp / 10;
+                            status <= 2'b11;
                         end
                     end
+                end
 
-                    OP: 
-                    if(!enable)begin
-                    begin
-                        if(cmd != operacao)
-                        begin
-                            regA <= digits; // Salva o valor em regA
-                            digits <= 0;    // zera as entradas anteriores, prepara para receber o B futuramente
-                            temp <= 0;   
-                        
+                OP: begin
+                    if (!enable) begin
+                        if (cmd != operacao) begin
+                            regA <= digits;
+                            digits <= 0;
+                            temp <= 0;
                         end
-                        if(cmd > 4'd9 && cmd < 4'd13) // as operações estão em 10, 11 e 12
-                        begin    
-                            operacao <= cmd;                    // salva a entrada em operacao
-                            status <= 2'b11;        // coloca em ocupado para apagar os displays
-                        end                
+                        if (cmd > 4'd9 && cmd < 4'd13) begin
+                            operacao <= cmd;
+                            status <= 2'b11;
+                        end
                     end
-                    end
+                end
 
-                    ESPERA_B: 
-                    begin
-                        
-                        if(!enable) 
-                        begin
-                            if (cmd <= 4'd9) 
-                            begin
-                                digits <= (digits * 10) + cmd; // Adiciona o novo dígito
-                                status <= 2'b01;                // ocupado para att displays
-                                temp <= (temp * 10) + cmd;
-                                enable <= 1;
-                            end 
-                            else if (cmd == 4'b1111)        // Backspace
-                            begin
-                                digits <= digits / 10; // Remove o último dígito
-                                status <= 2'b01;        // att displays
-                            end 
-                            else if(cmd == 4'b1110) // se for ' = '
-                            begin 
-                                regB <= digits;     // Salva o valor em regB
-                                digits <= 0;        // zera digits
-                                status <= 2'b01;    // att displays
+                ESPERA_B: begin
+                    if (!enable) begin
+                        if (cmd <= 4'd9) begin
+                            digits <= (digits * 10) + cmd;
+                            status <= 2'b01;
+                            temp <= (temp * 10) + cmd;
+                            enable <= 1;
+                        end else if (cmd == 4'b1111) begin // Backspace
+                            digits <= digits / 10;
+                            status <= 2'b01;
+                        end else if (cmd == 4'b1110) begin // '='
+                            regB <= digits;
+                            digits <= 0;
+                            status <= 2'b01;
+                        end
+                    end
+                end
+
+                RESULT: begin
+                    case (operacao)
+                        4'b1010: begin // SOMA
+                            digits <= regA + regB;
+                            status <= 2'b01;
+                        end
+
+                        4'b1011: begin // SUBTRAÇÃO
+                            digits <= regA - regB;
+                            status <= 2'b01;
+                        end
+
+                        4'b1100: begin // MULTIPLICAÇÃO
+                            if (status == 2'b01 && count == 0) begin
+                                count  <= (regA > regB) ? regB : regA;
+                                regAux <= (regA > regB) ? regA : regB;
+                            end else if (count > 0) begin
+                                digits <= digits + regAux;
+                                count  <= count - 1;
+                            end else if (count == 0) begin
+                                operacao <= 0;
+                                status <= 2'b01;
                             end
                         end
-                    end
 
-                    RESULT: 
-                    begin
-                        
-                        if (status == 2'b10) begin  // so faz se estiver pronto
-
-                            case (operacao)         // ve qual operação foi escolhida
-                                4'b1010:            // SOMA
-                                begin 
-                                    digits <= regA + regB;  // soma A e B
-                                    status <= 2'b01;        // displays
-                                end
-                                4'b1011:            // SUBTRAÇÃO
-                                begin 
-                                    digits <= regA - regB;   // subtrai A e B
-                                    status <= 2'b01;         // displays
-                                end
-                                4'b1100:            // MULTIPLICAÇÃO
-                                begin 
-                                    status <= 2'b01;          // coloca em ocupado para fazer a multiplicação
-                                        if ((status == 2'b01) && (count == 0))  // se estiver ocupado e count for 0 (multiplicação não começou)
-                                        begin
-                                            count  <= (regA > regB) ? regB : regA;  // Define o menor valor como contador
-                                            regAux <= (regA > regB) ? regA : regB;  // Define o maior valor para ficar somando
-                                        end else if (count > 0)                     // Se count, agora com regA ou regB, for maior que 0 ... 
-                                        begin
-                                            digits <= digits + regAux; // soma o anterior com o valor de aux (maior dos regs)
-                                            count  <= count - 1;       // decrementa o contador
-                                        end else if (count == 0)       // se count chegar a 0 ...
-                                        begin
-                                            operacao <= 0;             // limpa a operação para entrar na atualização dos displays
-                                            status <= 2'b01; // ocupado após mult
-                                        end
-                                end
-                                default: begin
-                                    
-                                    // Erro
-                                end
-                            endcase
-
+                        default: begin
+                            // Erro
                         end
-                    
-                    end
+                    endcase
+                end
 
-                    ERRO: begin
-                        status <= 2'b00; //status ERRO
-                    end
+                ERRO: begin
+                    status <= 2'b00; // status ERRO
+                end
 
-                endcase
-                    //LÓGICA PARA OS DISPLAYS
-                // MEXEDOR DA POSIÇÃO
-                if(enable)begin
-                    // aqui estamos tendo alguns probleminhas ainda, o pos quando estiver em 0 não ira imprimir o valor certo, por conta do data estar atrasado 1 clock
-                    // não sei se aquela coisa q o lucas fez de botar pos-1 vai funcionar, talvez sim, enfim de tarde vemos melhor, vo corta o cabelo
-                    if( pos == 4'd8)begin
-                        pos <= 0;
-                        enable <= 0;
-                        end
-                    if (status == 00 || status == 11) begin // na real nem precisaria disso aq kkkkkk, pq ele só entra pra imprimir se existir o enable
-                
-                    values[pos] <= temp % 10; temp <= temp/10; // coloca em values[pos] o valor do digits correspondente, depois corta esse valor
-                
-                    data <= values[pos];
-                
-                    // Incrementa pos enquanto ocupado, passa para a proxima posição
-                        pos <= pos + 1;
-                    end
+                default: begin
+                    // Caso padrão
+                end
 
-                    end 
-            end
+            endcase
         end
+    end
+end
+
+        
 
     // mudar as maquina de estados
     always_comb begin        // talvez seja melhor fazer com combinacional
