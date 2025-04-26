@@ -35,7 +35,7 @@ module calc (
     logic [26:0] count;
 
     // Ajudam a passar os valores e posições para os CTRL fazer a organização dos displays
-    logic values [7:0];
+  
     logic [26:0] temp;
     
 
@@ -68,10 +68,10 @@ always_ff @(posedge clock or posedge reset) begin
                 pos <= 0;
                 enable <= 0;
             end else if (status == 2'b00 || status == 2'b11) begin
-                values[pos] <= temp % 10;
+                data <= temp % 10;
                 temp <= temp / 10;
-                data <= values[pos];
                 pos <= pos + 1;
+                
             end
         end else begin
             case (EA)
@@ -161,7 +161,7 @@ end
 
     // mudar as maquina de estados
     always_comb begin        // talvez seja melhor fazer com combinacional
-       
+       if (!enable)begin
         case (EA)
             ESPERA_A: begin
                 if ((cmd > 4'd9)&&(cmd < 4'd11))begin       // se for um operador passa para OP, se for 1111 (backspace) mantem em ESPERA_A
@@ -188,7 +188,6 @@ end
 
             end
             RESULT: begin
-                if( status == 2'b10)begin                               // se estiver pronto, espera "limpar" os displays, possivel erro
                 case (operacao)
                     4'b1010: PE = ESPERA_A;                           //   se for ' + ' vai para ESPERA_A
 
@@ -207,12 +206,12 @@ end
 
                 endcase
                 end else PE = RESULT;                                 // se não estiver pronto, fica em RESULT (espera até o status de pronto)
-            end
 
             ERRO:
                 PE = ERRO; //fica no erro até dar reset               // se der ERRO, espera o RESET
 
         endcase
+       end
     end
 
 
