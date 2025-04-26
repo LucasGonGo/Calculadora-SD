@@ -5,7 +5,9 @@ module calc (
 
     output logic [1:0] status,
     output logic [3:0] data,
-    output logic [3:0] pos
+    output logic [3:0] pos,
+    output logic [2:0] EA,
+    output logic [2:0] PE
 );
 
     // Parametros locais para a FSM
@@ -69,6 +71,7 @@ always_ff @(posedge clock or posedge reset) begin
                 pos <= 0;
                 enable <= 0;
                 status <= 2'b10;
+                temp <= digits; // recupera o temp pra receber mais digitos
             end else if (status == 2'b00 || status == 2'b11) begin
                 data <= temp % 10;
                 temp <= temp / 10;
@@ -190,9 +193,9 @@ end
                     PE = RESULT;
                 end 
 
-                else if (cmd >= 4'b1010 && cmd < 4'b1110)               // se for OP vai para ERRO
+                else if (cmd >= 4'b1010 && cmd < 4'b1110)               // se for OP vai para esperaB denovo, vai voltando até achar algum caractere
                 begin
-                    PE = ERRO;
+                    PE = ESPERA_B;
                 end
                 else PE = ESPERA_B;                                   // se for qualquer outra coisa (0 - 9) fica em ESPERA_B
 
