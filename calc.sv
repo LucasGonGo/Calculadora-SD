@@ -26,6 +26,8 @@ module calc (
     //habilitar a impressão
     logic enable;
 
+    
+
     // Salva as entradas entre ESPERA_A e ESPERA_B
     logic [26:0] regA, regB, regAux;
 
@@ -92,17 +94,22 @@ always_ff @(posedge clock or posedge reset) begin
                             status <= 2'b11;
                             enable <= 1;
                         end
-                end
-
-                OP: begin
-                        if (cmd != operacao) begin
+                        // indo para o OP
+                        else begin
                             regA <= digits;
                             digits <= 0;
                             temp <= 0;
+                            status <= 2'b11;
+                            enable <= 1;
+
                         end
+                end
+
+                OP: begin
+                       
                         if (cmd > 4'd9 && cmd < 4'd13) begin
                             operacao <= cmd;
-                            status <= 2'b11;
+                            
                         end
                 end
 
@@ -116,11 +123,13 @@ always_ff @(posedge clock or posedge reset) begin
                             digits <= digits / 10;
                             temp <= temp / 10;
                             status <= 2'b11;
+                            enable <= 1;
                         end else if (cmd == 4'b1110) begin // '='
                             regB <= digits;
                             digits <= 0;
                             temp <= 0;
                             status <= 2'b11;
+                            enable <= 1;
                         end
                 end
 
@@ -177,15 +186,17 @@ end
     else if (!enable)begin
         case (EA)
             ESPERA_A: begin
-                if ((cmd > 4'd9)&&(cmd < 4'd11))begin       // se for um operador passa para OP, se for 1111 (backspace) mantem em ESPERA_A
+                if ((cmd > 4'd9)&&(cmd < 4'd11))begin       // se for um operador passa para OP, salva tudo, e ja imprime, se for 1111 (backspace) mantem em ESPERA_A
                     PE = OP;
                 end
                 else PE = ESPERA_A;                        // se for um numero ou backspace mantem em ESPERA_A
             end
 
-            OP: begin if(status == 2'b10 && cmd < 4'b1010) PE = ESPERA_B;    // se estiver em PRONTO e não for operação, vai para ESPERA_B, possivel erro, não conseguimos resolver
-            else PE = OP;    end                                          // se for operação mantem em OP
-                
+            OP: begin if (cmd > 4'd9 && cmd < 4'd13) begin
+                            PE = ESPERA_B; 
+            end else begin PE = OP; end 
+                        
+                        end                                   // confia, ele vai cair em OP, armazena a operação e pula fora, foge, se nao for uma operaçao, volta pra OP               
             ESPERA_B: begin
             
                 if (cmd == 4'b1110)                                     // se for ' = ' vai para RESULT
