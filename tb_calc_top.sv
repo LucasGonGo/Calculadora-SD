@@ -31,13 +31,13 @@ module tb_calc_top;
 
   initial begin
     reset = 1; #2;
-    reset = 0; ;
+    reset = 0; 
 
   // Teste 1
     cmd = 4'd1; #18; // 1
     cmd = 4'd2; #18; // 2
     cmd = 4'd3; #20; // 3
-    cmd = 4'b1010; #20; // +
+    cmd = 4'b1010; #25; // +
     cmd = 4'd1; #18; // 1
     cmd = 4'b1110; #30; // 124
     $finish;
