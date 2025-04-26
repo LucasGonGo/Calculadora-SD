@@ -67,6 +67,7 @@ always_ff @(posedge clock or posedge reset) begin
             if (pos == 4'd8) begin
                 pos <= 0;
                 enable <= 0;
+                status <= 2'b10;
             end else if (status == 2'b00 || status == 2'b11) begin
                 data <= temp % 10;
                 temp <= temp / 10;
@@ -86,6 +87,7 @@ always_ff @(posedge clock or posedge reset) begin
                             digits <= digits / 10;
                             temp <= temp / 10;
                             status <= 2'b11;
+                            enable <= 1;
                         end
                 end
 
@@ -104,16 +106,18 @@ always_ff @(posedge clock or posedge reset) begin
                 ESPERA_B: begin
                         if (cmd <= 4'd9) begin
                             digits <= (digits * 10) + cmd;
-                            status <= 2'b01;
+                            status <= 2'b11;
                             temp <= (temp * 10) + cmd;
                             enable <= 1;
                         end else if (cmd == 4'b1111) begin // Backspace
                             digits <= digits / 10;
-                            status <= 2'b01;
+                            temp <= temp / 10;
+                            status <= 2'b11;
                         end else if (cmd == 4'b1110) begin // '='
                             regB <= digits;
                             digits <= 0;
-                            status <= 2'b01;
+                            temp <= 0;
+                            status <= 2'b11;
                         end
                 end
 
@@ -121,24 +125,29 @@ always_ff @(posedge clock or posedge reset) begin
                     case (operacao)
                         4'b1010: begin // SOMA
                             digits <= regA + regB;
-                            status <= 2'b01;
+                            temp <= regA + regB;
+                            status <= 2'b11;
+                            enable <= 1;
                         end
 
                         4'b1011: begin // SUBTRAÇÃO
                             digits <= regA - regB;
-                            status <= 2'b01;
+                            temp <= regA - regB;
+                            status <= 2'b11;
+                            enable <= 1;
                         end
 
-                        4'b1100: begin // MULTIPLICAÇÃO
+                        4'b1100: begin // MULTIPLICAÇÃO deixa pra dps
                             if (status == 2'b01 && count == 0) begin
                                 count  <= (regA > regB) ? regB : regA;
                                 regAux <= (regA > regB) ? regA : regB;
                             end else if (count > 0) begin
-                                digits <= digits + regAux;
+                                temp <= temp + regAux;
                                 count  <= count - 1;
                             end else if (count == 0) begin
                                 operacao <= 0;
-                                status <= 2'b01;
+                                status <= 2'b11;
+                                enable <= 1;
                             end
                         end
 
