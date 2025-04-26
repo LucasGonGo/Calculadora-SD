@@ -35,7 +35,7 @@ module calc (
     logic [26:0] count;
 
     // Ajudam a passar os valores e posições para os CTRL fazer a organização dos displays
-    logic [3:0] values [7:0];
+    logic values [7:0];
     logic [26:0] temp;
     
 
@@ -48,7 +48,7 @@ module calc (
             EA <= PE;
         end
     end
-    
+
 // Bloco sequencial: lógica da operação
 always_ff @(posedge clock or posedge reset) begin
     if (reset) begin        // reset, zera tudo
@@ -77,7 +77,6 @@ always_ff @(posedge clock or posedge reset) begin
             case (EA)
 
                 ESPERA_A: begin
-                    if (!enable) begin
                         if (cmd <= 4'd9) begin
                             digits <= (digits * 10) + cmd;
                             status <= 2'b11;
@@ -88,11 +87,9 @@ always_ff @(posedge clock or posedge reset) begin
                             temp <= temp / 10;
                             status <= 2'b11;
                         end
-                    end
                 end
 
                 OP: begin
-                    if (!enable) begin
                         if (cmd != operacao) begin
                             regA <= digits;
                             digits <= 0;
@@ -102,11 +99,9 @@ always_ff @(posedge clock or posedge reset) begin
                             operacao <= cmd;
                             status <= 2'b11;
                         end
-                    end
                 end
 
                 ESPERA_B: begin
-                    if (!enable) begin
                         if (cmd <= 4'd9) begin
                             digits <= (digits * 10) + cmd;
                             status <= 2'b01;
@@ -120,7 +115,6 @@ always_ff @(posedge clock or posedge reset) begin
                             digits <= 0;
                             status <= 2'b01;
                         end
-                    end
                 end
 
                 RESULT: begin
@@ -156,10 +150,6 @@ always_ff @(posedge clock or posedge reset) begin
 
                 ERRO: begin
                     status <= 2'b00; // status ERRO
-                end
-
-                default: begin
-                    // Caso padrão
                 end
 
             endcase
