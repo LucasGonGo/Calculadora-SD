@@ -204,11 +204,7 @@ end
                     PE = RESULT;
                 end 
 
-                else if (cmd >= 4'b1010 && cmd < 4'b1110)               // se for OP vai para esperaB denovo, vai voltando até achar algum caractere
-                begin
-                    PE = ESPERA_B;
-                end
-                else PE = ESPERA_B;                                   // se for qualquer outra coisa (0 - 9) fica em ESPERA_B
+                else PE = ESPERA_B;                                   // se for qualquer outra coisa (0 - 9) ou OP(fica esperando um caractere) fica em ESPERA_B
 
             end
             RESULT: begin
