@@ -86,19 +86,21 @@ module calc (
                     end
 
                     OP: 
+                    if(!enable)begin
                     begin
-
                         if(cmd != operacao)
                         begin
                             regA <= digits; // Salva o valor em regA
-                            digits <= 0;    // zera as entradas anteriores, prepara para receber o B futuramente   
+                            digits <= 0;    // zera as entradas anteriores, prepara para receber o B futuramente
+                            temp <= 0;   
                         
                         end
                         if(cmd > 4'd9 && cmd < 4'd13) // as operações estão em 10, 11 e 12
                         begin    
                             operacao <= cmd;                    // salva a entrada em operacao
-                            status <= 2'b01;        // coloca em ocupado para apagar os displays
+                            status <= 2'b11;        // coloca em ocupado para apagar os displays
                         end                
+                    end
                     end
 
                     ESPERA_B: 
@@ -129,6 +131,7 @@ module calc (
 
                     RESULT: 
                     begin
+                        
                         if (status == 2'b10) begin  // so faz se estiver pronto
 
                             case (operacao)         // ve qual operação foi escolhida
@@ -198,57 +201,57 @@ module calc (
         end
 
     // mudar as maquina de estados
-    always_ff @(posedge clock) begin        // talvez seja melhor fazer com combinacional
+    always_comb begin        // talvez seja melhor fazer com combinacional
        
         case (EA)
             ESPERA_A: begin
                 if ((cmd > 4'd9)&&(cmd < 4'd11))begin       // se for um operador passa para OP, se for 1111 (backspace) mantem em ESPERA_A
-                    PE <= OP;
+                    PE = OP;
                 end
-                else PE <= ESPERA_A;                        // se for um numero ou backspace mantem em ESPERA_A
+                else PE = ESPERA_A;                        // se for um numero ou backspace mantem em ESPERA_A
             end
 
-            OP: if(status == 4'b10 && cmd < 4'b1010) PE <= ESPERA_B;    // se estiver em PRONTO e não for operação, vai para ESPERA_B, possivel erro, não conseguimos resolver
-            else PE <= OP;                                              // se for operação mantem em OP
+            OP: if(status == 4'b10 && cmd < 4'b1010) PE = ESPERA_B;    // se estiver em PRONTO e não for operação, vai para ESPERA_B, possivel erro, não conseguimos resolver
+            else PE = OP;                                              // se for operação mantem em OP
                 
             ESPERA_B: begin
             
                 if (cmd == 4'b1110)                                     // se for ' = ' vai para RESULT
                 begin
-                    PE <= RESULT;
+                    PE = RESULT;
                 end 
 
                 else if (cmd >= 4'b1010 && cmd < 4'b1110)               // se for OP vai para ERRO
                 begin
-                    PE <= ERRO;
+                    PE = ERRO;
                 end
-                else PE <= ESPERA_B;                                   // se for qualquer outra coisa (0 - 9) fica em ESPERA_B
+                else PE = ESPERA_B;                                   // se for qualquer outra coisa (0 - 9) fica em ESPERA_B
 
             end
             RESULT: begin
                 if( status == 2'b10)begin                               // se estiver pronto, espera "limpar" os displays, possivel erro
                 case (operacao)
-                    4'b1010: PE <= ESPERA_A;                           //   se for ' + ' vai para ESPERA_A
+                    4'b1010: PE = ESPERA_A;                           //   se for ' + ' vai para ESPERA_A
 
-                    4'b1011: PE <= ESPERA_A;                           //   se for ' - ' vai para ESPERA_A
+                    4'b1011: PE = ESPERA_A;                           //   se for ' - ' vai para ESPERA_A
 
                     4'b1100:begin                                      //   se for ' x ' ...
                         if (status != 2'b01 && count == 0)begin        //       se não estiver ocupado e count for 0 vai para ESPERA_A
-                            PE <= ESPERA_A;
+                            PE = ESPERA_A;
                         end
                         else begin
-                            PE <= RESULT;                              // se não, fica em RESULT
+                            PE = RESULT;                              // se não, fica em RESULT
                         end
                     end
                     default:
-                        PE <= ERRO;                                    // se não for nenhuma operação disponivel, vai para ERRO
+                        PE = ERRO;                                    // se não for nenhuma operação disponivel, vai para ERRO
 
                 endcase
-                end else PE <= RESULT;                                 // se não estiver pronto, fica em RESULT (espera até o status de pronto)
+                end else PE = RESULT;                                 // se não estiver pronto, fica em RESULT (espera até o status de pronto)
             end
 
             ERRO:
-                PE <= ERRO; //fica no erro até dar reset               // se der ERRO, espera o RESET
+                PE = ERRO; //fica no erro até dar reset               // se der ERRO, espera o RESET
 
         endcase
     end
