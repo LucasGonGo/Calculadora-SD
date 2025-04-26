@@ -57,7 +57,7 @@ module calc (
             regB     <= 0;
             regAux   <= 0;
             count    <= 0;
-            status   <= 2'b10;   // 00 significa erro, 01 ocupado, e 10 pronto
+            status   <= 2'b10;   // 00 significa erro, 01 ocupado, 10 pronto e 11 imprimindo
             operacao <= 0;
             pos <= 4'b0000;
             end else begin
@@ -70,15 +70,16 @@ module calc (
 
                             if (cmd <= 4'd9) begin
                                 digits <= (digits * 10) + cmd; // faz o deslocamento e adiciona
-                                status <= 2'b01;               // coloca status como ocupado para passar os valores para os displays
-                                temp <= ( temp * 10 ) + cmd;
+                                status <= 2'b11;               // coloca status como imprimindo para passar os valores para os displays
+                                temp <= ( temp * 10 ) + cmd; //temp vai ser exibido no display
                                 enable <= 1;
                             end 
 
                             else if (cmd == 4'b1111)           // Backspace
                             begin
                                 digits <= digits / 10; // corta o ultimo numero de digits
-                                status <= 2'b01;       // coloca em ocupado para atualizar os displays
+                                temp <= temp / 10;
+                                status <= 2'b11;       // coloca em ocupado para atualizar os displays
                             end 
 
                         end
@@ -175,31 +176,21 @@ module calc (
                 endcase
                     //LÓGICA PARA OS DISPLAYS
                 // MEXEDOR DA POSIÇÃO
-                    if (pos > 4'b0111) begin
-                    // Reseta pos após todos os displays serem atualizados
-                            pos <= 4'b0000;
-                            status <= 2'b10;
-                    end else 
-                    
-                    if (status == 00 || (status == 2'b01 && operacao != 4'b1100)) begin // se estiver em ERRO ou se estiver ocupado fora da multiplicação...
-                    
-
-                    if(pos == 0) begin temp = digits; end
-                    // mapeia para o values o que estiver no digits, tudo isso combinacionalmente, errado mas não conseguimos de outra forma
-    
+                if(enable)begin
+                    // aqui estamos tendo alguns probleminhas ainda, o pos quando estiver em 0 não ira imprimir o valor certo, por conta do data estar atrasado 1 clock
+                    // não sei se aquela coisa q o lucas fez de botar pos-1 vai funcionar, talvez sim, enfim de tarde vemos melhor, vo corta o cabelo
+                    if (status == 00 || status == 11) begin // na real nem precisaria disso aq kkkkkk, pq ele só entra pra imprimir se existir o enable
+                
                     values[pos] <= temp % 10; temp <= temp/10; // coloca em values[pos] o valor do digits correspondente, depois corta esse valor
-                    
-
-                    // Exibe os valores apenas se o status for ocupado, exceto durante a multi
+                
                     data <= values[pos];
-                    
-                        
                 
                     // Incrementa pos enquanto ocupado, passa para a proxima posição
                         pos <= pos + 1;
                     end
 
                     end 
+            end
         end
 
     // mudar as maquina de estados
