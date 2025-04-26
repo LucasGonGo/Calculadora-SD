@@ -34,7 +34,7 @@ module tb_calc_top;
     cmd = 4'd2; #20;
     cmd = 4'd3; #20;
     cmd = 4'd3; #20;
-    $finish
+    $finish;
     
 
   // Teste 2
