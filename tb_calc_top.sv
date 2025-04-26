@@ -31,7 +31,7 @@ module tb_calc_top;
 
   initial begin
     reset = 1; #2;
-    reset = 0; #20;
+    reset = 0; ;
 
   // Teste 1
     cmd = 4'd1; #20;
