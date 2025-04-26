@@ -192,9 +192,11 @@ end
                 else PE = ESPERA_A;                        // se for um numero ou backspace mantem em ESPERA_A
             end
 
-            OP: begin if (cmd > 4'd9 && cmd < 4'd13) begin
+            OP: begin 
+                $display("PE = %b, Operacao = %b", PE, operacao);
+                if (cmd > 4'd9 && cmd < 4'd13) begin
                             PE = ESPERA_B; 
-            end else begin PE = OP; end 
+            end else if (cmd != operacao) begin PE = OP; end 
                         
                         end                                   // confia, ele vai cair em OP, armazena a operação e pula fora, foge, se nao for uma operaçao, volta pra OP               
             ESPERA_B: begin
