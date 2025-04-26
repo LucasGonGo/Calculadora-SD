@@ -183,8 +183,8 @@ end
                 else PE = ESPERA_A;                        // se for um numero ou backspace mantem em ESPERA_A
             end
 
-            OP: if(status == 2'b10 && cmd < 4'b1010) PE = ESPERA_B;    // se estiver em PRONTO e não for operação, vai para ESPERA_B, possivel erro, não conseguimos resolver
-            else PE = OP;                                              // se for operação mantem em OP
+            OP: begin if(status == 2'b10 && cmd < 4'b1010) PE = ESPERA_B;    // se estiver em PRONTO e não for operação, vai para ESPERA_B, possivel erro, não conseguimos resolver
+            else PE = OP;    end                                          // se for operação mantem em OP
                 
             ESPERA_B: begin
             
@@ -220,9 +220,9 @@ end
                 endcase
                 end else PE = RESULT;                                 // se não estiver pronto, fica em RESULT (espera até o status de pronto)
 
-            ERRO:
+            ERRO: begin
                 PE = ERRO; //fica no erro até dar reset               // se der ERRO, espera o RESET
-
+            end
         endcase
        end
     end
