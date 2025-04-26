@@ -71,7 +71,7 @@ always_ff @(posedge clock or posedge reset) begin
                 enable <= 0;
                 status <= 2'b10;
                 temp <= digits; // recupera o temp pra receber mais digitos
-            end else if (status == 2'b00 || status == 2'b11) begin
+            end else begin
                 data <= temp % 10;
                 temp <= temp / 10;
                 pos <= pos + 1;
@@ -173,6 +173,8 @@ end
 
     // mudar as maquina de estados
     always_comb begin        // talvez seja melhor fazer com combinacional
+    PE = ESPERA_A;
+    else
        if (!enable)begin
         case (EA)
             ESPERA_A: begin
