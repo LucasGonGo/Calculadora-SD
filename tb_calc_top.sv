@@ -39,7 +39,7 @@ module tb_calc_top;
     cmd = 4'd3; #20; // 3
     cmd = 4'b1010; #30; // +
     cmd = 4'd1; #10; // 1
-    cmd = 4'b1110; #30; // 124
+    cmd = 4'b1110; #60; // 124
     $finish;
     
 
