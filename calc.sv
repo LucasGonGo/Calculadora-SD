@@ -18,8 +18,7 @@ module calc (
     localparam ERRO     = 3'b100;
 
     // Estado Atual / Proximo Estado
-    logic [2:0] EA;
-    logic [2:0] PE;
+ 
     
     // Guardar as entradas
     logic [26:0] digits;
@@ -218,9 +217,9 @@ end
                         PE = ERRO;                                    // se não for nenhuma operação disponivel, vai para ERRO
 
                 endcase
-                end else PE = RESULT;                                 // se não estiver pronto, fica em RESULT (espera até o status de pronto)
+            end else begin PE = RESULT;       end                          // se não estiver pronto, fica em RESULT (espera até o status de pronto)
 
-            ERRO: begin
+            default: begin
                 PE = ERRO; //fica no erro até dar reset               // se der ERRO, espera o RESET
             end
         endcase
