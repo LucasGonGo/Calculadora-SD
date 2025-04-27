@@ -40,9 +40,19 @@ module calc (
     // Ajudam a passar os valores e posições para os CTRL fazer a organização dos displays
   
     logic [26:0] temp;
+
+    logic reset_temp;                       // guarda o valor do reset
+    logic negedge_reset;                    // vou usar na FSM pra achar a borda de descida do reset
+
+    always_ff @(posedge clock or posedge reset) begin   // vai guardar o valor do reset
+        if(reset) begin
+            reset_temp <= 1;
+        end else begin
+            reset_temp <= 0;
+        end
+    end
+    assign negedge_reset = (reset_temp == 1) && (reset == 0);   // checa se teve borda de descida no reset, se estava em 1 e agora é 0 então teve borda de descida
     
-
-
     // Bloco sequencial: atualização do estado
     always_ff @(posedge clock or posedge reset) begin
         if (reset) begin
@@ -213,13 +223,13 @@ end
             RESULT: begin
                 case (operacao)
                     4'b1010:begin
-                        if(reset)PE = ESPERA_A;            // so vai para ESPERA_A se der reset,
+                        if(negedge_reset)PE = ESPERA_A;            // so vai para ESPERA_A se der reset,
                         else begin                        // se ele for antes ele pode pegar o cmd errado
                             PE = RESULT;                          
                         end
                     end
                     4'b1011: begin
-                        if(reset)PE = ESPERA_A;            // so vai para ESPERA_A se der reset,
+                        if(negedge_reset)PE = ESPERA_A;            // so vai para ESPERA_A se der reset,
                         else begin                        // se ele for antes ele pode pegar o cmd errado
                             PE = RESULT;                          
                         end
