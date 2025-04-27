@@ -205,11 +205,11 @@ end
 
             OP: begin 
                 $display("PE = %b, Operacao = %b", PE, operacao);
-                if (operacao >= 4'd10) begin
+                if (operacao >= 4'd10 && cmd != operacao) begin
                             PE = ESPERA_B; 
             end else PE = OP;
                         
-                        end                                   // confia, ele vai cair em OP, armazena a operação e pula fora, foge, se nao for uma operaçao, volta pra OP               
+            end                                   // confia, ele vai cair em OP, armazena a operação e pula fora, foge, se nao for uma operaçao, volta pra OP               
             ESPERA_B: begin
             
                 if (cmd == 4'b1110)                                     // se for ' = ' vai para RESULT
