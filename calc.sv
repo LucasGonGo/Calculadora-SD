@@ -212,10 +212,18 @@ end
             end
             RESULT: begin
                 case (operacao)
-                    4'b1010: PE = ESPERA_A;                           //   se for ' + ' vai para ESPERA_A
-
-                    4'b1011: PE = ESPERA_A;                           //   se for ' - ' vai para ESPERA_A
-
+                    4'b1010:begin
+                        if(reset)PE = ESPERA_A;            // so vai para ESPERA_A se der reset,
+                        else begin                        // se ele for antes ele pode pegar o cmd errado
+                            PE = RESULT;                          
+                        end
+                    end
+                    4'b1011: begin
+                        if(reset)PE = ESPERA_A;            // so vai para ESPERA_A se der reset,
+                        else begin                        // se ele for antes ele pode pegar o cmd errado
+                            PE = RESULT;                          
+                        end
+                    end
                     4'b1100:begin                                      //   se for ' x ' ...
                         if (status != 2'b01 && count == 0)begin        //       se não estiver ocupado e count for 0 vai para ESPERA_A
                             PE = ESPERA_A;
