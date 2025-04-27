@@ -215,10 +215,11 @@ end
                 if (cmd == 4'b1110)                                     // se for ' = ' vai para RESULT
                 begin
                     PE = RESULT;
-                end else if((cmd < 4'd9)or(cmd == 4'b1111)) begin
+                end else if((cmd < 4'd9)||(cmd == 4'b1111)) begin
                     PE = ESPERA_B;                                   // se for ' backspace ' vai pra 
-                end else PE <= ERRO;                                 // se for qualquer outra coisa (0 - 9) ou OP(fica esperando um caractere) fica em ESPERA_B
-
+                end else begin 
+                    PE <= ERRO; 
+                end                                // se for qualquer outra coisa (0 - 9) ou OP(fica esperando um caractere) fica em ESPERA_B
             end
             RESULT: begin
                 case (operacao)
