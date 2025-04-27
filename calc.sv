@@ -41,17 +41,17 @@ module calc (
   
     logic [26:0] temp;
 
-    logic reset_temp;                       // guarda o valor do reset
-    logic negedge_reset;                    // vou usar na FSM pra achar a borda de descida do reset
+    // logic reset_temp;                       // guarda o valor do reset
+    // logic negedge_reset;                    // vou usar na FSM pra achar a borda de descida do reset
 
-    always_ff @(posedge clock or posedge reset) begin   // vai guardar o valor do reset
-        if(reset) begin
-            reset_temp <= 1;
-        end else begin
-            reset_temp <= 0;
-        end
-    end
-    assign negedge_reset = (reset_temp == 1) && (reset == 0);   // checa se teve borda de descida no reset, se estava em 1 e agora é 0 então teve borda de descida
+    // always_ff @(posedge clock or posedge reset) begin   // vai guardar o valor do reset
+    //     if(reset) begin
+    //         reset_temp <= 1;
+    //     end else begin
+    //         reset_temp <= 0;
+    //     end
+    // end
+    // assign negedge_reset = (reset_temp == 1) && (reset == 0);   // checa se teve borda de descida no reset, se estava em 1 e agora é 0 então teve borda de descida
     
     // Bloco sequencial: atualização do estado
     always_ff @(posedge clock or posedge reset) begin
@@ -197,7 +197,7 @@ end
     else if (!enable)begin
         case (EA)
             ESPERA_A: begin
-                if ((cmd > 4'd9)&&(cmd < 4'd11))begin       // se for um operador passa para OP, salva tudo, e ja imprime, se for 1111 (backspace) mantem em ESPERA_A
+                if ((cmd > 4'd9)&&(cmd < 4'd13))begin       // se for um operador passa para OP, salva tudo, e ja imprime, se for 1111 (backspace) mantem em ESPERA_A
                     PE = OP;
                 end
                 else PE = ESPERA_A;                        // se for um numero ou backspace mantem em ESPERA_A
@@ -215,21 +215,21 @@ end
                 if (cmd == 4'b1110)                                     // se for ' = ' vai para RESULT
                 begin
                     PE = RESULT;
-                end 
-
-                else PE = ESPERA_B;                                   // se for qualquer outra coisa (0 - 9) ou OP(fica esperando um caractere) fica em ESPERA_B
+                end else if((cmd < 4'd9)or(cmd == 4'b1111)) begin
+                    PE = ESPERA_B;                                   // se for ' backspace ' vai pra 
+                end else PE <= ERRO;                                 // se for qualquer outra coisa (0 - 9) ou OP(fica esperando um caractere) fica em ESPERA_B
 
             end
             RESULT: begin
                 case (operacao)
                     4'b1010:begin
-                        if(negedge_reset)PE = ESPERA_A;            // so vai para ESPERA_A se der reset,
+                        if(reset)PE = ESPERA_A;            // so vai para ESPERA_A se der reset,
                         else begin                        // se ele for antes ele pode pegar o cmd errado
                             PE = RESULT;                          
                         end
                     end
                     4'b1011: begin
-                        if(negedge_reset)PE = ESPERA_A;            // so vai para ESPERA_A se der reset,
+                        if(reset)PE = ESPERA_A;            // so vai para ESPERA_A se der reset,
                         else begin                        // se ele for antes ele pode pegar o cmd errado
                             PE = RESULT;                          
                         end
