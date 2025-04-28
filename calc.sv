@@ -16,8 +16,8 @@ module calc (
     localparam ERRO     = 3'b100;
 
     // Estado Atual / Proximo Estado
-    logic [2:0] EA,
-    logic [2:0] PE
+    logic [2:0] EA;
+    logic [2:0] PE;
     
     // Guardar as entradas
     logic [26:0] digits;
