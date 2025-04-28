@@ -47,7 +47,7 @@ module tb_calc_top;
   // // Teste 2: 50 - 15 =
      cmd = 4'd5; #20;
      cmd = 4'd0; #20;
-     cmd = 4'b1011; #20;
+     cmd = 4'b1011; #30;
      cmd = 4'd1; #20;
      cmd = 4'd5; #20;
      cmd = 4'b1110; #20;
