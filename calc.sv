@@ -5,9 +5,7 @@ module calc (
 
     output logic [1:0] status,
     output logic [3:0] data,
-    output logic [3:0] pos,
-    output logic [2:0] EA,
-    output logic [2:0] PE
+    output logic [3:0] pos
 );
 
     // Parametros locais para a FSM
@@ -18,15 +16,14 @@ module calc (
     localparam ERRO     = 3'b100;
 
     // Estado Atual / Proximo Estado
- 
+    logic [2:0] EA,
+    logic [2:0] PE
     
     // Guardar as entradas
     logic [26:0] digits;
 
     //habilitar a impressão
     logic enable;
-
-    
 
     // Salva as entradas entre ESPERA_A e ESPERA_B
     logic [26:0] regA, regB, regAux;
@@ -41,17 +38,6 @@ module calc (
   
     logic [26:0] temp;
 
-    // logic reset_temp;                       // guarda o valor do reset
-    // logic negedge_reset;                    // vou usar na FSM pra achar a borda de descida do reset
-    // always_ff @(posedge clock or posedge reset) begin   // vai guardar o valor do reset
-    //     if(reset) begin
-    //         reset_temp <= 1;
-    //     end else begin
-    //         reset_temp <= 0;
-    //     end
-    // end
-    // assign negedge_reset = (reset_temp == 1) && (reset == 0);   // checa se teve borda de descida no reset, se estava em 1 e agora é 0 então teve borda de descida
-    
     // Bloco sequencial: atualização do estado
     always_ff @(posedge clock or posedge reset) begin
         if (reset) begin
