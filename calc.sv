@@ -205,7 +205,7 @@ end
 
             OP: begin 
                 $display("PE = %b, Operacao = %b", PE, operacao);
-                if (operacao >= 4'd10 && cmd != operacao) begin
+                if (operacao >= 4'd10) begin
                             PE = ESPERA_B; 
             end else PE = OP;
                         
