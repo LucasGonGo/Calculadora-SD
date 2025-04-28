@@ -61,7 +61,7 @@ module tb_calc_top;
 
   // Teste 3: 6 * 2 =
    cmd = 4'd6; #20;
-   cmd = 4'b1100; #20;
+   cmd = 4'b1100; #10;
    cmd = 4'd2; #20;
    cmd = 4'b1110; #100; // demora mais pra fazer a multiplicação
 
