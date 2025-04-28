@@ -115,7 +115,7 @@ always_ff @(posedge clock or posedge reset) begin
                 end
 
                 OP: begin
-                    if (cmd >= 4'd10) begin
+                    if (cmd > 4'd9) begin
                         operacao <= cmd; // Atribuição não bloqueante
                         $display("Estado OP: cmd = %b, operacao = %b", cmd, operacao); // Debug
                     end else begin
