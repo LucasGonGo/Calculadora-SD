@@ -71,7 +71,8 @@ always_ff @(posedge clock or posedge reset) begin
         regAux   <= 0;
         count    <= 0;
         temp     <= 0;
-        status   <= 2'b10;   // 00 significa erro, 01 ocupado, 10 pronto e 11 imprimindo
+        status   <= 2'b11;   // 00 significa erro, 01 ocupado, 10 pronto e 11 imprimindo
+        enable <= 1;
         operacao <= 0;
         pos <= 0;
     end else begin
@@ -105,7 +106,7 @@ always_ff @(posedge clock or posedge reset) begin
                             enable <= 1;
                         end
                         // indo para o OP
-                        else begin
+                        else if ((cmd > 4'd9)&&(cmd < 4'd13)) begin
                             regA <= digits;
                             digits <= 0;
                             temp <= 0;
@@ -161,9 +162,10 @@ always_ff @(posedge clock or posedge reset) begin
                         end
 
                         4'b1100: begin // MULTIPLICAÇÃO deixa pra dps
-                            if (status == 2'b01 && count == 0) begin
+                            if (status == 2'b10 && count == 0) begin
                                 count  <= (regA > regB) ? regB : regA;
                                 regAux <= (regA > regB) ? regA : regB;
+                                status <= 2'b01;
                             end else if (count > 0) begin
                                 temp <= temp + regAux;
                                 count  <= count - 1;
@@ -236,7 +238,7 @@ end
                         end
                     end
                     4'b1100:begin                                      //   se for ' x ' ...
-                        if (status != 2'b01 && count == 0)begin        //       se não estiver ocupado e count for 0 vai para ESPERA_A
+                        if (operacao == 0)begin        //       se não estiver ocupado e count for 0 vai para ESPERA_A
                             PE = ESPERA_A;
                         end
                         else begin
