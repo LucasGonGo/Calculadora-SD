@@ -218,7 +218,7 @@ end
                 end else if((cmd < 4'd9)||(cmd == 4'b1111)) begin
                     PE = ESPERA_B;                                   // se for ' backspace ' vai pra 
                 end else begin 
-                    PE <= ERRO; 
+                    PE <= ESPERA_B; 
                 end                                // se for qualquer outra coisa (0 - 9) ou OP(fica esperando um caractere) fica em ESPERA_B
             end
             RESULT: begin
