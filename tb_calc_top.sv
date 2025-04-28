@@ -72,7 +72,9 @@ module tb_calc_top;
     cmd = 4'd5; #20;
     cmd = 4'd6; #20;
     cmd = 4'b1111; #30;
-    cmd = 4'b1110; #60;  
+    cmd = 4'b1110; #60;
+    reset = 1; #2;
+    reset = 0;   
 
     #20;
     $finish;
